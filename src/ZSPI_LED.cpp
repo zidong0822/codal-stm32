@@ -41,7 +41,7 @@ int ZSPI_LED::transfer(const uint8_t *txBuffer, uint32_t txSize, uint8_t *rxBuff
 }
 
 int ZSPI_LED::startTransfer(const uint8_t *txBuffer, uint32_t txSize, uint8_t *rxBuffer,
-                        uint32_t rxSize, PVoidCallback doneHandler, void *arg) {
+                            uint32_t rxSize, PVoidCallback doneHandler, void *arg) {
     int res;
 
     init_internal();
@@ -74,4 +74,10 @@ int ZSPI_LED::startTransfer(const uint8_t *txBuffer, uint32_t txSize, uint8_t *r
     CODAL_ASSERT(res == HAL_OK, DEVICE_SPI_ERROR);
     return 0;
 }
+
+int ZSPI_LED::setFrequency(uint32_t frequency) {
+    // Do not use set frequency
+    return DEVICE_OK;
+}
+
 }
