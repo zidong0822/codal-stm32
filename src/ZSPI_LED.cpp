@@ -26,9 +26,9 @@ ZSPI_LED::ZSPI_LED(codal::Pin &mosi, codal::Pin &miso, codal::Pin &sclk) : codal
     uint8_t txBuffer[8 * 3 * 4 + 1] = {};
     uint32_t txSize = 8 * 3 * 4 + 1;
     // init spi data
-    transfer(txBuffer, txSize, NULL, 0);
-    fiber_sleep(1000);
-    transfer(txBuffer, txSize, NULL, 0);
+    // transfer(txBuffer, txSize, NULL, 0);
+    // fiber_sleep(1000);
+    // transfer(txBuffer, txSize, NULL, 0);
 }
 
 int ZSPI_LED::transfer(const uint8_t *txBuffer, uint32_t txSize, uint8_t *rxBuffer, uint32_t rxSize) {
