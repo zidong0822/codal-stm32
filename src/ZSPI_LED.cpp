@@ -20,15 +20,7 @@
 namespace codal {
 
 ZSPI_LED::ZSPI_LED(codal::Pin &mosi, codal::Pin &miso, codal::Pin &sclk) : codal::ZSPI(mosi, miso, sclk) {
-
-    freq = 3200000;
-    needsInit = true;
-    uint8_t txBuffer[8 * 3 * 4 + 1] = {};
-    uint32_t txSize = 8 * 3 * 4 + 1;
-    // init spi data
-    // transfer(txBuffer, txSize, NULL, 0);
-    // fiber_sleep(1000);
-    // transfer(txBuffer, txSize, NULL, 0);
+    firstLight = true;
 }
 
 int ZSPI_LED::transfer(const uint8_t *txBuffer, uint32_t txSize, uint8_t *rxBuffer, uint32_t rxSize) {
@@ -77,6 +69,49 @@ int ZSPI_LED::startTransfer(const uint8_t *txBuffer, uint32_t txSize, uint8_t *r
 
 int ZSPI_LED::setFrequency(uint32_t frequency) {
     // Do not use set frequency
+    return DEVICE_OK;
+}
+
+int ZSPI_LED::show(int id, uint8_t red, uint8_t green, uint8_t blue, bool auto_delay) {
+
+    if (firstLight) {
+        // set default frequency
+        freq = 3200000;
+        needsInit = true;
+        // init spi data
+        transfer(txBuffer, txSize, NULL, 0);
+        target_wait_us(100);
+        transfer(txBuffer, txSize, NULL, 0);
+        target_wait_us(100);
+        memset(txBuffer, 0x88, txSize - 1);
+        firstLight = false;
+    }
+
+    if (id >= 8) {
+        return DEVICE_INVALID_PARAMETER;
+    }
+
+    int index = id * 12;
+    txBuffer[index] = buf_bytes[green >> 6 & mask];
+    txBuffer[index + 1] = buf_bytes[green >> 4 & mask];
+    txBuffer[index + 2] = buf_bytes[green >> 2 & mask];
+    txBuffer[index + 3] = buf_bytes[green & mask];
+
+    txBuffer[index + 4] = buf_bytes[red >> 6 & mask];
+    txBuffer[index + 5] = buf_bytes[red >> 4 & mask];
+    txBuffer[index + 6] = buf_bytes[red >> 2 & mask];
+    txBuffer[index + 7] = buf_bytes[red & mask];
+
+    txBuffer[index + 8] = buf_bytes[blue >> 6 & mask];
+    txBuffer[index + 9] = buf_bytes[blue >> 4 & mask];
+    txBuffer[index + 10] = buf_bytes[blue >> 2 & mask];
+    txBuffer[index + 11] = buf_bytes[blue & mask];
+
+    transfer(txBuffer, txSize, NULL, 0);
+    if (auto_delay) {
+        target_wait_us(100);
+    }
+
     return DEVICE_OK;
 }
 
